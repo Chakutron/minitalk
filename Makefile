@@ -6,7 +6,7 @@
 #    By: mchiboub <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/07 15:15:55 by mchiboub          #+#    #+#              #
-#    Updated: 2023/04/08 18:26:50 by mchiboub         ###   ########.fr        #
+#    Updated: 2023/04/11 14:36:28 by mchiboub         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,21 +30,31 @@ OBJSERV = ${SRCSERV:.c=.o}
 	  
 OBJCLIENT = ${SRCCLIENT:.c=.o}
 
+GREEN = \033[0;32m
+NC = \033[0m
+
 all: ${CLIENT} ${SERVER}
 
+.c.o:
+		@${CC} ${CFLAGS} -c $< -o ${<:.c=.o}
+
 ${SERVER}: ${OBJSERV}
-		cd ${PRINTFDIR}	&& make
-		${CC} -o ${SERVER} ${OBJSERV} ${PRINTFDIR}/${LIBNAME}
+		@echo "Generating ${GREEN}SERVER${NC} executable.."
+		@make -sC ${PRINTFDIR} all
+		@${CC} -o ${SERVER} ${OBJSERV} ${PRINTFDIR}/${LIBNAME}
 
 ${CLIENT}: ${OBJCLIENT}
-		cd ${PRINTFDIR} && make
-		${CC} -o ${CLIENT} ${OBJCLIENT} ${PRINTFDIR}/${LIBNAME}
+		@echo "Generating ${GREEN}CLIENT${NC} executable.."
+		@make -sC ${PRINTFDIR} all
+		@${CC} -o ${CLIENT} ${OBJCLIENT} ${PRINTFDIR}/${LIBNAME}
 clean:
-	rm -f ${OBJCLIENT} ${OBJSERV}
-	cd ${PRINTFDIR} && make clean
+		@echo "Deleting object files.."
+		@rm -f ${OBJCLIENT} ${OBJSERV}
+		@make -sC ${PRINTFDIR} clean
 
 fclean: clean
-	rm -f ${SERVER} ${CLIENT}
-	cd ${PRINTFDIR} && make fclean
+		@echo "Deleting object & executable files.."
+		@rm -f ${SERVER} ${CLIENT}
+		@make -sC ${PRINTFDIR} fclean
 
 re: fclean all
